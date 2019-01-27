@@ -25,7 +25,7 @@ Type `help` in the debugger for description about commands. <br />
 
 This project is using:
 ======================
-linoise: 
+linenoise: 
 https://github.com/antirez/linenoise.git
 
 libelfin:
