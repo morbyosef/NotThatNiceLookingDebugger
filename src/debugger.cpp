@@ -120,15 +120,9 @@ void debugger::set_pc(uint64_t pc) {
 }
 
 void debugger::step_over_breakpoint() {
-    auto bp_position = this->get_pc() - 1; // optional breakpoint address
-
-    if(this->_process_breakpoints.count(bp_position)){
-        auto &bp = this->_process_breakpoints.at(bp_position);
-
+    if(this->_process_breakpoints.count(this->get_pc())){
+        auto &bp = this->_process_breakpoints.at(this->get_pc());
         if(bp.is_enabled()){ // if bp is enabled disable step over and enable again
-
-            set_pc(bp_position);
-
             bp.disable();
             ptrace(PTRACE_SINGLESTEP, this->_process_pid, nullptr, nullptr);
             this->wait_for_signal();
@@ -141,8 +135,42 @@ void debugger::wait_for_signal() {
     int wait_status;
     auto options = 0;
     waitpid(this->_process_pid , &wait_status, options);
+
+    siginfo_t info = this->get_signal_info();
+
+    switch(info.si_signo){
+        case SIGTRAP:
+            this->handle_breakpoint(info);
+            break;
+        case SIGSEGV:
+            std::cout << "Segfault: " << info.si_code << std::endl;
+            break;
+        default:
+            std::cout << "Signal recieved: " << strsignal(info.si_signo) << std::endl;
+    }
 }
 
+siginfo_t debugger::get_signal_info(){
+    siginfo_t info;
+    ptrace(PTRACE_GETSIGINFO, this->_process_pid, nullptr, &info);
+    return info;
+}
+
+void debugger::handle_breakpoint(siginfo_t info){
+    
+    dwarf::line_table::iterator line_entry = this->get_line_entry_from_pc(this->get_pc());
+
+    switch(info.si_signo){
+        case SI_KERNEL: break;
+        case TRAP_BRKPT:
+            this->set_pc(get_pc()-1);
+            std::cout << "Breakpoint hit at 0x" << std::hex << this->get_pc() << std::endl;
+            this->print_source(line_entry->file->path ,line_entry->line);
+            break;
+        case TRAP_TRACE: break;
+        default: std::cout << "Unknown SIGTRAP " << info.si_code << std::endl;
+    }
+}
 
 dwarf::die debugger::get_function_from_pc(uint64_t pc) {
     for(auto &cu : this->_process_dwarf.compilation_units()){ // iterate threw compilation units until finding one with the pc in it
@@ -177,26 +205,26 @@ dwarf::line_table::iterator debugger::get_line_entry_from_pc(uint64_t pc) {
     throw std::out_of_range("Cant find line entry");
 }
 
-void debugger::print_soruce(std::string &file_name, unsigned line, unsigned lines_context) {
+void debugger::print_source(const std::string &file_name, unsigned line, unsigned lines_context) {
     std::ifstream file(file_name);
     auto start = line <= lines_context ? 1: line - lines_context;
     auto end = line + lines_context  + (line < lines_context ? lines_context -line : 0) + 1;
     char c;
+    unsigned curr_line = 1u;
 
-    auto curr_line = 1u;
     while(curr_line != start && file.get(c)){
         if(c == '\n'){
             curr_line++;
         }
     }
 
-    std::cout << curr_line==line ? "> " : " ";
+    std::cout << (curr_line == line ? "> " : " ");
 
     while(curr_line <= end && file.get(c)){
         std::cout << c;
         if(c == '\n'){
             curr_line++;
-            std::cout << (current_line==line ? "> " : "  ");
+            std::cout << (curr_line == line ? "> " : "  ");
         }
     }
 

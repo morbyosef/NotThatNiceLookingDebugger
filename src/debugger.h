@@ -6,6 +6,7 @@
 #define UNTITLED_DEBUGGER_H
 
 #include <string>
+#include <fstream>
 #include <sys/wait.h>
 #include <iomanip>
 #include <vector>
@@ -38,7 +39,9 @@ private:
     void print_help();
     dwarf::die get_function_from_pc(uint64_t pc);
     dwarf::line_table::iterator get_line_entry_from_pc(uint64_t);
-    void print_soruce(std::string &file_name, unsigned line, unsigned lines_context);
+    void print_source(const std::string &file_name, unsigned line, unsigned lines_context = 2);
+    siginfo_t get_signal_info();    
+    void handle_breakpoint(siginfo_t);
 
     pid_t _process_pid;
     std::string _process_name;
