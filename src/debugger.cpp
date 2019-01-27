@@ -6,10 +6,10 @@
 #include "debugger.h"
 
 debugger::debugger(std::string process_name, pid_t pid) : _process_name(process_name), _process_pid(pid) {
-    //auto filedwarf = open(process_name.c_str(), O_RDONLY);
+    auto filedwarf = open(process_name.c_str(), O_RDONLY);
 
-    //this->_process_elf = elf::elf(elf::create_mmap_loader(filedwarf));
-    //this->_process_dwarf = dwarf::dwarf(dwarf::elf::create_loader(this->_process_elf));
+    this->_process_elf = elf::elf(elf::create_mmap_loader(filedwarf));
+    this->_process_dwarf = dwarf::dwarf(dwarf::elf::create_loader(this->_process_elf));
 }
 
 void debugger::run() {
@@ -19,7 +19,7 @@ void debugger::run() {
 
     waitpid(this->_process_pid, &wait_status, settings);
 
-    while((command = linenoise("MorDebugger> ")) != nullptr){
+    while((command = linenoise("NotThatNiceLookingDebugger > ")) != nullptr){
         this->handle_command(command);
         linenoiseHistoryAdd(command);
         linenoiseFree(command);
@@ -39,6 +39,7 @@ void debugger::print_help() {
     std::cout << "      read <0xaddress>: read memory from address" << std::endl;
     std::cout << "      write <0xaddress> <0xvalue>: write the value to the address memory" << std::endl << std::endl;
 }
+
 void debugger::handle_command(const std::string &line) { // split the line by the delimiter
     std::vector<std::string> arguments = Helper::splitString(line, ' ');
     std::string command = arguments[0];
@@ -142,7 +143,7 @@ void debugger::wait_for_signal() {
     waitpid(this->_process_pid , &wait_status, options);
 }
 
-/*
+
 dwarf::die debugger::get_function_from_pc(uint64_t pc) {
     for(auto &cu : this->_process_dwarf.compilation_units()){ // iterate threw compilation units until finding one with the pc in it
         if(dwarf::die_pc_range(cu.root()).contains(pc)){
@@ -177,8 +178,28 @@ dwarf::line_table::iterator debugger::get_line_entry_from_pc(uint64_t pc) {
 }
 
 void debugger::print_soruce(std::string &file_name, unsigned line, unsigned lines_context) {
+    std::ifstream file(file_name);
     auto start = line <= lines_context ? 1: line - lines_context;
-    auto end = line +lines_context  + (line < lines_context ? lines_context -line : 0) + 1;
+    auto end = line + lines_context  + (line < lines_context ? lines_context -line : 0) + 1;
     char c;
+
+    auto curr_line = 1u;
+    while(curr_line != start && file.get(c)){
+        if(c == '\n'){
+            curr_line++;
+        }
+    }
+
+    std::cout << curr_line==line ? "> " : " ";
+
+    while(curr_line <= end && file.get(c)){
+        std::cout << c;
+        if(c == '\n'){
+            curr_line++;
+            std::cout << (current_line==line ? "> " : "  ");
+        }
+    }
+
+    std::cout << std::endl;
 }
- */
+ 

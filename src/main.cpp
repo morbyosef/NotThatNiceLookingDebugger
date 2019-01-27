@@ -21,6 +21,7 @@ int main(int argc, char * argv[]) {
         execl(programName, programName, nullptr);
     }
     else if( pid >= 1){
+        std::cout << "Welcome to NotThatNiceLookingDebugger!" << std::endl << "Type 'help' to show commands" << std::endl;
         debugger dbg(programName, pid);
         dbg.run();
     }

@@ -16,10 +16,8 @@
 #include "Breakpoint.h"
 #include "Registers.h"
 #include "linenoise.h"
-//#include "libelfin/dwarf/dwarf++.hh"
-//#include "libelfin/elf/elf++.hh"
-
-
+#include "libelfin/dwarf/dwarf++.hh"
+#include "libelfin/elf/elf++.hh"
 
 class debugger {
 public:
@@ -38,14 +36,14 @@ private:
     void step_over_breakpoint();
     void wait_for_signal();
     void print_help();
-    //dwarf::die get_function_from_pc(uint64_t pc);
-    //dwarf::line_table::iterator get_line_entry_from_pc(uint64_t);
-    //void print_soruce(std::string &file_name, unsigned line, unsigned lines_context);
+    dwarf::die get_function_from_pc(uint64_t pc);
+    dwarf::line_table::iterator get_line_entry_from_pc(uint64_t);
+    void print_soruce(std::string &file_name, unsigned line, unsigned lines_context);
 
     pid_t _process_pid;
     std::string _process_name;
-    //dwarf::dwarf _process_dwarf;
-    //elf::elf _process_elf;
+    dwarf::dwarf _process_dwarf;
+    elf::elf _process_elf;
     std::unordered_map<std::intptr_t ,Breakpoint> _process_breakpoints;
 };
 
