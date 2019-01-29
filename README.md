@@ -12,10 +12,12 @@ Requirements
 Initialization
 ==============
 
-`git clone https://github.com/morbyosef/NotThatNiceLookingDebugger.git  <br />
-cd NotThatNiceLookingDebugger <br />
-cmake . <br />
-make ` 
+```
+git clone https://github.com/morbyosef/NotThatNiceLookingDebugger.git 
+cd NotThatNiceLookingDebugger
+cmake . 
+make  
+```
 
 Usage
 =====
@@ -25,11 +27,9 @@ Type `help` in the debugger for description about commands. <br />
 
 This project is using:
 ======================
-linenoise: 
-https://github.com/antirez/linenoise.git
+- linenoise: https://github.com/antirez/linenoise.git
 
-libelfin:
-https://github.com/aclements/libelfin.git
+- libelfin: https://github.com/aclements/libelfin.git
 
 
 
