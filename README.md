@@ -12,10 +12,10 @@ Requirements
 Initialization
 ==============
 
-`git clone https://github.com/morbyosef/NotThatNiceLookingDebugger.git ` <br />
-`cd NotThatNiceLookingDebugger` <br />
-`cmake .` <br />
-`make ` 
+`git clone https://github.com/morbyosef/NotThatNiceLookingDebugger.git  <br />
+cd NotThatNiceLookingDebugger <br />
+cmake . <br />
+make ` 
 
 Usage
 =====
