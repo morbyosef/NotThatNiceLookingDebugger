@@ -17,8 +17,8 @@
 #include "Breakpoint.h"
 #include "Registers.h"
 #include "linenoise.h"
-#include "libelfin/dwarf/dwarf++.hh"
-#include "libelfin/elf/elf++.hh"
+#include "../ext/libelfin/dwarf/dwarf++.hh"
+#include "../ext/libelfin/elf/elf++.hh"
 
 class debugger {
 public:

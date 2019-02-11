@@ -15,7 +15,9 @@ Initialization
 ```
 git clone https://github.com/morbyosef/NotThatNiceLookingDebugger.git 
 cd NotThatNiceLookingDebugger
-cmake . 
+mkdir Build
+cd Build
+cmake .. 
 make  
 ```
 
